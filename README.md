@@ -117,6 +117,10 @@ npm run test:cleanup
 
 The test account is random and written only to ignored `.data/test-account.json`; cleanup removes it. E2E uses a real database and mutates temporary content. Run it against a disposable test database, never production. Browser screenshots/traces are ignored outputs in `test-results`.
 
+## Vercel
+
+For GitHub import, environment variables and the current serverless upload limitations, see [VERCEL.md](./VERCEL.md). The build command generates the ignored Prisma client before compiling; database setup remains an explicit release step.
+
 ## Deployment and remaining configuration
 
 Provide a managed PostgreSQL database, `AUTH_SECRET`, real `SITE_URL`, a persistent private upload volume (or implement the storage interface for S3/Cloudinary), backups and HTTPS. Run migrations before starting the new version. Build-time Prisma tooling currently needs devDependencies; do not omit them before generating/building. Keep process secrets in your host's secret manager.
