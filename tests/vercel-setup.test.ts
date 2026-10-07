@@ -70,3 +70,45 @@ test("migrations prefer direct connections while seeding uses the application co
     ["seed", "pooled"],
   ]);
 });
+
+test("admin setup is opt-in and production-only", () => {
+  let calls = 0;
+  setup({ VERCEL_ENV: "production", DATABASE_URL: "test" }, () => calls++);
+  setup({ HTY_SETUP_ADMIN: "true", VERCEL_ENV: "preview" }, () => calls++);
+  assert.equal(calls, 0);
+});
+test("invalid admin credentials prevent all setup mutations", () => {
+  assert.throws(
+    () =>
+      setup(
+        {
+          HTY_SETUP_DATABASE: "true",
+          HTY_SETUP_ADMIN: "true",
+          VERCEL_ENV: "production",
+          DATABASE_URL: "test",
+          ADMIN_EMAIL: "bad",
+          ADMIN_PASSWORD: "short",
+          AUTH_SECRET: "short",
+        },
+        () => assert.fail("must not mutate"),
+      ),
+    /ADMIN_EMAIL/,
+  );
+});
+test("admin creation can run independently after database initialization", () => {
+  const calls: string[] = [];
+  setup(
+    {
+      HTY_SETUP_ADMIN: "true",
+      VERCEL_ENV: "production",
+      DATABASE_URL: "test",
+      ADMIN_EMAIL: "admin@example.invalid",
+      ADMIN_PASSWORD: "Test-only-password!",
+      AUTH_SECRET: "test-only-secret".repeat(3),
+    },
+    (script) => {
+      calls.push(script);
+    },
+  );
+  assert.deepEqual(calls, ["admin:bootstrap"]);
+});

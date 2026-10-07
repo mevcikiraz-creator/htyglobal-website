@@ -105,7 +105,7 @@ Turkish navigation, primary homepage/page/sector copy and sample descriptions ar
 
 ## Validation
 
-Nine unit tests exercise invalid/valid form inputs, slug/publication validation, streamed body size limits, configured-origin checks, concurrent development-store persistence, and deployment setup guards (explicit opt-in, production-only execution, required connection, failure handling and direct migration connections). Five browser tests exercise public/detail routes, filtering, Turkish locale, rendered optimized images, three viewport sizes, mobile navigation, admin protection, product create/publish/duplicate/delete, contact/RFQ persistence, private attachment access and media/PDF upload/edit/delete.
+Twelve unit tests exercise invalid/valid form inputs, slug/publication validation, streamed body size limits, configured-origin checks, concurrent development-store persistence, and deployment setup guards (explicit opt-in, production-only execution, required connection, failure handling, direct migration connections and first-administrator credential guards). Five browser tests exercise public/detail routes, filtering, Turkish locale, rendered optimized images, three viewport sizes, mobile navigation, admin protection, product create/publish/duplicate/delete, contact/RFQ persistence, private attachment access and media/PDF upload/edit/delete.
 
 With the app running locally:
 

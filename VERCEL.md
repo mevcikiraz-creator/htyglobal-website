@@ -30,7 +30,15 @@ Neon'u bu Vercel projesine bağladıktan sonra **Environment Variables** bölüm
 
 Bu açıkça etkinleştirilmiş ilk kurulum, tabloları kayıtlı migrations ile oluşturur ve mevcut içeriği değiştirmeyen örnek içerik seed komutunu çalıştırır. Reset/drop çalıştırmaz. Migration bağlantısında varsa Neon'un `DATABASE_URL_UNPOOLED` adresi kullanılır; uygulama/seed normal `DATABASE_URL` kullanır. Preview deployment'ları bu kurulum adımını çalıştırmaz. Kurulum başarısızsa build durur; uygulama eksik tablolarla yayımlanmaz.
 
-Site açıldıktan sonra `HTY_SETUP_DATABASE` değişkenini kaldırın. Bayrak kaldırıldığında sonraki build işlemleri veritabanı kurulumu çalıştırmaz. Sonraki şema güncellemelerinde release migrations işlemi ayrıca planlanmalıdır. Bu kurulum yönetici hesabı veya auth secret oluşturmaz; bunlar aşağıdaki güvenli bootstrap komutuyla ve güvenli ortam değişkenleriyle ayrıca ayarlanır.
+Site açıldıktan sonra `HTY_SETUP_DATABASE` değişkenini kaldırın. Bayrak kaldırıldığında sonraki build işlemleri veritabanı kurulumu çalıştırmaz. Sonraki şema güncellemelerinde release migrations işlemi ayrıca planlanmalıdır. Bu veritabanı kurulumu yönetici hesabı veya auth secret oluşturmaz; aşağıdaki yönetici kurulum adımı ayrıca etkinleştirilir.
+
+### İlk yönetici hesabını Vercel üzerinden oluşturmak
+
+**Production** için `ADMIN_EMAIL`, `ADMIN_PASSWORD` (en az 12 karakter, en fazla 72 UTF-8 bayt) ve `AUTH_SECRET` (en az 32 karakterlik farklı rastgele değer) değişkenlerini **Secret** türüyle ekleyin. Hesap adı e-posta biçimindedir; bu işlem e-posta göndermez. `AUTH_SECRET` uygulamanın oturumlarını imzalar; şifreyle aynı olmamalı ve kurulum sonrasında korunmalıdır.
+
+Yalnızca **Production** kapsamına `HTY_SETUP_ADMIN=true` (**Config**) ekleyip son commit'i yeniden deploy edin. Bu işlem mevcut hesabın şifresini, rolünü veya etkinliğini değiştirmez. Aynı etkin yönetici aynı şifreyle zaten varsa yeniden hesap açmaz; farklı bir yönetici varsa panel üzerinden kullanıcı eklemenizi ister. Eksik/geçersiz bootstrap bilgileri build'i durdurur. Preview deployment'ları hesap oluşturmaz. Tablolar henüz yoksa veritabanı bootstrap adımı da etkin olmalıdır.
+
+`/admin/login` üzerinden giriş yaptıktan sonra `HTY_SETUP_ADMIN`, `ADMIN_EMAIL` ve `ADMIN_PASSWORD` değişkenlerini kaldırın; varsa `HTY_SETUP_DATABASE` bayrağını da kaldırın. **AUTH_SECRET ve DATABASE_URL kalmalıdır.** Sonraki deployment hesabı etkilemez. Şifreyi panelde değiştirdikten sonra bootstrap yeniden etkinleştirilirse eski şifreyle hesap sıfırlanmaz.
 
 ### Terminal üzerinden alternatif kurulum
 
@@ -46,7 +54,7 @@ npm run seed
 npm run admin:create
 ```
 
-Yönetici oluşturma bilgileri yalnızca bu komut için gereklidir; bunları genel uygulama ortamında tutmayın. Migration/seed yalnızca Production için `HTY_SETUP_DATABASE=true` etkinleştirildiğinde build sırasında çalışır. Yönetici hesabı oluşturma build sırasında çalışmaz.
+Yönetici oluşturma bilgileri yalnızca bu komut için gereklidir; bunları genel uygulama ortamında tutmayın. Migration/seed yalnızca Production için `HTY_SETUP_DATABASE=true` etkinleştirildiğinde build sırasında çalışır. İlk yönetici hesabı yalnızca ayrıca `HTY_SETUP_ADMIN=true` ile etkinleştirildiğinde oluşturulur.
 
 ## Kalıcı dosyalar ve Vercel sınırları
 
