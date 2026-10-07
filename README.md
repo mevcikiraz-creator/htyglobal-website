@@ -105,7 +105,7 @@ Turkish navigation, primary homepage/page/sector copy and sample descriptions ar
 
 ## Validation
 
-Five unit tests exercise invalid/valid form inputs, slug/publication validation, streamed body size limits, configured-origin checks and concurrent development-store persistence. Five browser tests exercise public/detail routes, filtering, Turkish locale, rendered optimized images, three viewport sizes, mobile navigation, admin protection, product create/publish/duplicate/delete, contact/RFQ persistence, private attachment access and media/PDF upload/edit/delete.
+Nine unit tests exercise invalid/valid form inputs, slug/publication validation, streamed body size limits, configured-origin checks, concurrent development-store persistence, and deployment setup guards (explicit opt-in, production-only execution, required connection, failure handling and direct migration connections). Five browser tests exercise public/detail routes, filtering, Turkish locale, rendered optimized images, three viewport sizes, mobile navigation, admin protection, product create/publish/duplicate/delete, contact/RFQ persistence, private attachment access and media/PDF upload/edit/delete.
 
 With the app running locally:
 
@@ -119,7 +119,7 @@ The test account is random and written only to ignored `.data/test-account.json`
 
 ## Vercel
 
-For GitHub import, environment variables and the current serverless upload limitations, see [VERCEL.md](./VERCEL.md). The build command generates the ignored Prisma client before compiling; database setup remains an explicit release step.
+For GitHub import, environment variables and the current serverless upload limitations, see [VERCEL.md](./VERCEL.md). The build command generates the ignored Prisma client before compiling; database setup is an explicitly enabled first-deployment step (`HTY_SETUP_DATABASE=true` on Vercel production only), or a manual release step. See VERCEL.md; remove the bootstrap flag after initialization.
 
 ## Deployment and remaining configuration
 

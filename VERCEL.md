@@ -7,7 +7,7 @@ GitHub deposu: https://github.com/mevcikiraz-creator/htyglobal-website
 1. https://vercel.com/new adresini açın ve GitHub hesabınızla giriş yapın.
 2. GitHub uygulamasına yalnızca gerekli depo erişimini verin. Liste boşsa **Adjust GitHub App Permissions** ile `htyglobal-website` deposunu ekleyin.
 3. `mevcikiraz-creator/htyglobal-website` için **Import** seçin.
-4. Framework: **Next.js**, Root Directory: depo kökü, Node.js: **24.x**, Install Command: `npm ci`, Build Command: `npm run build`. Depodaki `vercel.json` bu komutları tanımlar. Production Branch: `main`.
+4. Framework: **Next.js**, Root Directory: depo kökü, Node.js: **24.x**, Install Command: `npm ci`, Build Command: `npm run build:vercel`. Depodaki `vercel.json` bu komutları tanımlar. Production Branch: `main`.
 5. Aşağıdaki hizmetleri ve ortam değişkenlerini yapılandırdıktan sonra Deploy edin.
 
 GitHub kodunuzu saklar; Vercel web uygulamasını çalıştırır. Bu belge Vercel hesabınıza giriş yapmaz veya otomatik bir canlı yayın oluşturmaz.
@@ -17,11 +17,22 @@ GitHub kodunuzu saklar; Vercel web uygulamasını çalıştırır. Bu belge Verc
 Vercel Marketplace üzerinden Neon/Supabase gibi PostgreSQL hizmetlerinden birini bağlayın veya mevcut yönetilen PostgreSQL veritabanınızı kullanın. Sağlayıcının bağlantı/TLS ve sunucusuz kullanım önerilerini izleyin.
 
 Vercel Project Settings → Environment Variables:
+
 - `DATABASE_URL`: PostgreSQL sağlayıcısının bağlantı adresi. Yerel bulut ortamındaki 127.0.0.1 veritabanı Vercel'den erişilemez.
 - `AUTH_SECRET`: güvenli biçimde üretilmiş, en az 32 karakterlik rastgele gizli değer.
 - `SITE_URL`: Vercel projesinin gerçek HTTPS adresi veya bağladığınız alan adı. Proje adresi belirlendikten sonra güncelleyin ve yeniden deploy edin.
 
 Değerleri sohbet, GitHub veya paylaşılan loglara yazmayın. Preview ortamı için üretimden ayrı veritabanı ve secret kullanın. `ALLOW_DEV_STORE` ayarını etkinleştirmeyin; JSON deposu Vercel'de kalıcı değildir.
+
+### Yeni Neon veritabanını terminal kullanmadan kurmak
+
+Neon'u bu Vercel projesine bağladıktan sonra **Environment Variables** bölümünde `DATABASE_URL` değişkeninin **Production** için bulunduğunu doğrulayın. Gizli değerini açmanız/paylaşmanız gerekmez. Sonra yalnızca **Production** kapsamına `HTY_SETUP_DATABASE=true` ekleyin ve `main` dalının son commit'ini yeniden deploy edin. Build Command için elle yapılmış bir override varsa kaldırın veya `npm run build:vercel` yapın.
+
+Bu açıkça etkinleştirilmiş ilk kurulum, tabloları kayıtlı migrations ile oluşturur ve mevcut içeriği değiştirmeyen örnek içerik seed komutunu çalıştırır. Reset/drop çalıştırmaz. Migration bağlantısında varsa Neon'un `DATABASE_URL_UNPOOLED` adresi kullanılır; uygulama/seed normal `DATABASE_URL` kullanır. Preview deployment'ları bu kurulum adımını çalıştırmaz. Kurulum başarısızsa build durur; uygulama eksik tablolarla yayımlanmaz.
+
+Site açıldıktan sonra `HTY_SETUP_DATABASE` değişkenini kaldırın. Bayrak kaldırıldığında sonraki build işlemleri veritabanı kurulumu çalıştırmaz. Sonraki şema güncellemelerinde release migrations işlemi ayrıca planlanmalıdır. Bu kurulum yönetici hesabı veya auth secret oluşturmaz; bunlar aşağıdaki güvenli bootstrap komutuyla ve güvenli ortam değişkenleriyle ayrıca ayarlanır.
+
+### Terminal üzerinden alternatif kurulum
 
 Güvenli, üretim veritabanına erişebilen bir terminalde bağlantı bilgilerini ortam değişkenleriyle yükleyip sırayla çalıştırın:
 
@@ -35,7 +46,7 @@ npm run seed
 npm run admin:create
 ```
 
-Yönetici oluşturma bilgileri yalnızca bu komut için gereklidir; bunları genel uygulama ortamında tutmayın. Migration/seed/admin oluşturma build komutunda otomatik çalışmaz.
+Yönetici oluşturma bilgileri yalnızca bu komut için gereklidir; bunları genel uygulama ortamında tutmayın. Migration/seed yalnızca Production için `HTY_SETUP_DATABASE=true` etkinleştirildiğinde build sırasında çalışır. Yönetici hesabı oluşturma build sırasında çalışmaz.
 
 ## Kalıcı dosyalar ve Vercel sınırları
 

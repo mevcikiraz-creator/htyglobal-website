@@ -16,7 +16,8 @@
     "db:validate": "node scripts/validate-schema.cjs",
     "test:e2e": "playwright test",
     "test:prepare": "NODE_OPTIONS=--conditions=react-server tsx scripts/test-account.ts",
-    "test:cleanup": "NODE_OPTIONS=--conditions=react-server tsx scripts/remove-test-account.ts"
+    "test:cleanup": "NODE_OPTIONS=--conditions=react-server tsx scripts/remove-test-account.ts",
+    "build:vercel": "npm run db:generate && node scripts/vercel-setup.cjs && npm run build"
   },
   "dependencies": {
     "@prisma/adapter-pg": "7.10.0",
