@@ -18,6 +18,7 @@ type Props = {
     category?: string;
     q?: string;
     sort?: string;
+    view?: string;
     product?: string;
     wood?: string;
   }>;
@@ -313,6 +314,7 @@ export default async function Page({ params, searchParams }: Props) {
                 selected={selected}
                 query={search.q}
                 sort={search.sort}
+                view={search.view}
               />
             )}
             <Cta

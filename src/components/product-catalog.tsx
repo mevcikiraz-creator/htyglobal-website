@@ -9,6 +9,7 @@ export default function ProductCatalog({
   selected = "",
   query = "",
   sort = "",
+  view = "4",
 }: {
   products: RecordItem[];
   categories: RecordItem[];
@@ -16,7 +17,9 @@ export default function ProductCatalog({
   selected?: string;
   query?: string;
   sort?: string;
+  view?: string;
 }) {
+  const columns = view === "6" ? 6 : 4;
   const tr = locale === "tr",
     prefix = tr ? "/tr" : "";
   const search = query
@@ -35,11 +38,12 @@ export default function ProductCatalog({
     results.sort((a, b) =>
       String(a.title).localeCompare(String(b.title), locale),
     );
-  const href = (category = "") => {
+  const href = (category = "", viewColumns = columns) => {
     const params = new URLSearchParams({
       ...(category ? { category } : {}),
       ...(query ? { q: query } : {}),
       ...(sort ? { sort } : {}),
+      view: String(viewColumns),
     });
     return `${prefix}/products${params.size ? `?${params}` : ""}`;
   };
@@ -105,6 +109,7 @@ export default function ProductCatalog({
               {results.length} {tr ? "ürün" : "products"}
             </span>
             <form action={`${prefix}/products`} method="get">
+              <input type="hidden" name="view" value={columns} />
               {selected && (
                 <input type="hidden" name="category" value={selected} />
               )}
@@ -134,9 +139,30 @@ export default function ProductCatalog({
                 </select>
               </label>
             </form>
+            <nav
+              className="catalog-view"
+              aria-label={tr ? "Satırdaki ürün sayısı" : "Products per row"}
+            >
+              <span>{tr ? "Görünüm" : "View"}</span>
+              {[4, 6].map((count) => (
+                <Link
+                  key={count}
+                  href={href(selected, count)}
+                  scroll={false}
+                  aria-current={columns === count ? "true" : undefined}
+                  aria-label={
+                    tr ? `Satırda ${count} ürün` : `${count} products per row`
+                  }
+                >
+                  {tr ? `${count}’lü` : `${count} / row`}
+                </Link>
+              ))}
+            </nav>
           </div>
           {results.length ? (
-            <div className="product-grid">
+            <div
+              className={`product-grid catalog-product-grid columns-${columns}`}
+            >
               {results.map((item) => (
                 <Link
                   className="product-card"
@@ -148,7 +174,7 @@ export default function ProductCatalog({
                       src={String(item.data?.image || "/sample-chair.webp")}
                       alt={String(item.data?.imageAlt || item.title)}
                       fill
-                      sizes="(max-width: 600px) 50vw, (max-width: 1000px) 38vw, 25vw"
+                      sizes={`(max-width: 600px) 50vw, (max-width: 1100px) 38vw, ${columns === 6 ? "13vw" : "20vw"}`}
                       style={{ objectFit: "contain" }}
                     />
                     <span className="product-card-open">
