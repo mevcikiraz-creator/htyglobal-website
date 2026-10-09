@@ -1,5 +1,9 @@
 # Asset provenance — October 2026 collection revision
 
+## Fiorentini Bistro — Moscow, Russia
+
+`public/projects/fiorentini-bistro-moscow/01.webp` through `12.webp` are the 12 photographs supplied by the user in `Fiorentini Bistro - Moskova.rar`. Original JPEGs were rotated according to EXIF orientation, resized to a maximum 2000 pixels on either axis, and exported as WebP with metadata removed. Photo 01 is the project cover; photos 02–12 form the gallery. These supplied photographs document this restaurant reference and are separate from the illustrative demo assets below. No project year, photographer credit, specific timber species or production scope was supplied or invented.
+
 ## Original assets used
 
 - `public/products/arc-{beech,walnut,oak,ash}.webp`: catalogue views generated from our existing original AI chair illustration.
