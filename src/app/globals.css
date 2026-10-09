@@ -26,11 +26,20 @@ select {
   font: inherit;
 }
 button,
-a,
+a {
+  outline-offset: 5px;
+}
 input,
 textarea,
 select {
-  outline-offset: 5px;
+  outline-offset: -2px;
+}
+input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):focus,
+textarea:focus,
+select:focus {
+  outline: 2px solid transparent;
+  outline-offset: -2px;
+  box-shadow: inset 0 -2px 0 var(--ink);
 }
 button {
   cursor: pointer;
@@ -1070,7 +1079,7 @@ footer > .sample-note {
   padding: 10px 4px;
   width: 170px;
   font-size: 12px;
-  outline-offset: 0;
+  outline-offset: -2px;
 }
 .catalog-search button {
   background: none;
