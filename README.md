@@ -89,6 +89,18 @@ Products/projects have dedicated fields for images, gallery, dimensions, materia
 
 Pages, homepage and settings support common field controls plus an advanced structured JSON editor. Homepage data controls hero image/statement, introduction, section titles, selected items through their featured flags, statistics, manufacturing teaser and CTA. Clients control reference text/logos; settings control footer, contact/social details, brand/logo/favicon and default SEO. More complex page `sections` and homepage `statistics` are ordered arrays editable in JSON. This is a functional content editor, but not a drag-and-drop page builder or rich-text editor.
 
+### Product collection, wood previews and the homepage film
+
+The collection retains all 13 existing product categories, adds a category sidebar, search, sorting, responsive product cards and a dedicated product detail view. The right-hand customization panel offers Beech, Walnut, Oak and Ash. Each option uses a separate prepared image of the same product; it does not apply a colour filter to the entire photo. The six original sample products have 24 original AI-generated material previews. These are illustrative finish concepts, not calibrated photography or a live 3D model.
+
+CMS product fields: `woodBeechImage`, `woodWalnutImage`, `woodOakImage`, `woodAshImage` and `defaultWood`. Add corresponding views for each actual product. Missing options are disabled. Keep non-wood parts and the camera angle consistent when preparing replacement images. Main-view selection resets gallery view; other gallery photographs retain their own finishes. A product-specific quote link carries the product slug and wood choice into the RFQ; the server validates the selection and stores a canonical product snapshot and wood ID.
+
+Homepage fields: `heroVideo` (MP4 URL) and `heroVideoMode` (`scroll` or `loop`). An empty `heroVideo` uses the poster only. Scroll mode pins the film while page movement advances/reverses playback; reduced-motion mode uses a static poster. A pause/play control is supplied. The checked-in 13-second film is an original demonstration made with pans/transitions over our generated sample imagery. It is **not footage from Perkins&Will**. External or replaced MP4 files must support byte-range requests for seeking; keep a fast-start MP4 and frequent keyframes. The existing media uploader accepts images/PDF, not video: use a hosted video URL or commit an authorized, optimized demo asset.
+
+Vercel production builds run `content:release` after explicit bootstrap and before the Next build. This one-time-by-record update only refreshes untouched original demo images/category assignments and adds a film URL when the homepage has no video field. Deleted products, renamed/uploaded products, existing wood-preview fields, custom copy, galleries, chosen categories and existing films are preserved. It never writes user accounts. For local onboarding verification, `VERCEL_ENV=production npm run content:release` applies it to the configured **local** database.
+
+Paged, Laskasas and Perkins&Will were requested as references but blocked by the environment network filter. No products or video were downloaded from them. See [ASSET_SOURCES.md](./ASSET_SOURCES.md) for the asset provenance and replacement notes.
+
 Translations are JSON keyed by locale, e.g.:
 
 ```json
@@ -105,7 +117,7 @@ Turkish navigation, primary homepage/page/sector copy and sample descriptions ar
 
 ## Validation
 
-Twelve unit tests exercise invalid/valid form inputs, slug/publication validation, streamed body size limits, configured-origin checks, concurrent development-store persistence, and deployment setup guards (explicit opt-in, production-only execution, required connection, failure handling, direct migration connections and first-administrator credential guards). Five browser tests exercise public/detail routes, filtering, Turkish locale, rendered optimized images, three viewport sizes, mobile navigation, admin protection, product create/publish/duplicate/delete, contact/RFQ persistence, private attachment access and media/PDF upload/edit/delete.
+Fifteen unit tests exercise invalid/valid form inputs, slug/publication validation, streamed body size limits, configured-origin checks, concurrent development-store persistence, and deployment setup guards (explicit opt-in, production-only execution, required connection, failure handling, direct migration connections and first-administrator credential guards, safe sample-content release and supported wood selections). Seven browser tests exercise public/detail routes, filtering, Turkish locale, rendered optimized images, three viewport sizes, mobile navigation, admin protection, product create/publish/duplicate/delete, contact/RFQ persistence, private attachment access, media/PDF upload/edit/delete, collection search, four material previews and RFQ selection persistence, video byte ranges, scroll seeking in both directions and reduced-motion behavior.
 
 With the app running locally:
 

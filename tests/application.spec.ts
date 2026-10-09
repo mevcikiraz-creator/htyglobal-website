@@ -289,3 +289,124 @@ test("media images and PDF specifications upload, reuse, edit and delete", async
   });
   expect(invalid.status()).toBe(400);
 });
+
+test("collection search, wood previews and selected-product RFQ persist", async ({
+  page,
+  request,
+}) => {
+  test.setTimeout(90000);
+  await page.goto("/products");
+  await expect(page.locator(".catalog-categories a")).toHaveCount(14);
+  await expect(page.locator(".product-card")).toHaveCount(6);
+  await page.getByRole("textbox", { name: "Search products" }).fill("Linea");
+  await page.getByRole("button", { name: "Search", exact: true }).click();
+  await expect(page.locator(".product-card")).toHaveCount(1);
+  await expect(page.locator(".product-card")).toContainText("Linea");
+  await page.goto("/products?category=chairs");
+  await expect(page.locator(".product-card")).toHaveCount(1);
+  await expect(page.locator(".product-card")).toContainText("Contour");
+  for (const model of ["arc", "linea", "forma", "noma", "atelier", "contour"])
+    for (const wood of ["beech", "walnut", "oak", "ash"])
+      expect(
+        (await request.get(`/products/${model}-${wood}.webp`)).status(),
+      ).toBe(200);
+  await page.goto("/products/sample-product-1");
+  for (const [label, wood] of [
+    ["Beech", "beech"],
+    ["Walnut", "walnut"],
+    ["Oak", "oak"],
+    ["Ash", "ash"],
+  ]) {
+    await page.getByRole("button", { name: label, exact: true }).click();
+    await expect(page.locator(".product-stage")).toHaveAttribute(
+      "data-wood",
+      wood,
+    );
+    await expect(page.locator(".product-stage img")).toHaveAttribute(
+      "alt",
+      `Arc lounge chair — ${label}`,
+    );
+    await page
+      .locator(".product-stage img")
+      .evaluate((img) => (img as HTMLImageElement).decode());
+    expect(
+      await page
+        .locator(".product-stage img")
+        .evaluate((img) => (img as HTMLImageElement).currentSrc),
+    ).toContain(encodeURIComponent(`/products/arc-${wood}.webp`));
+  }
+  for (const width of [390, 768, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth,
+      ),
+    ).toBe(true);
+  }
+  await page.getByRole("button", { name: "Walnut", exact: true }).click();
+  await page
+    .getByRole("link", { name: "Request a quote", exact: true })
+    .click();
+  await expect(page).toHaveURL(/product=sample-product-1.*wood=walnut/);
+  await expect(page.locator(".quote-product-summary")).toContainText("Walnut");
+  const name = "Test wood quote " + Date.now();
+  await page.getByLabel("Name", { exact: true }).fill(name);
+  await page.getByLabel("Email", { exact: true }).fill("test@example.invalid");
+  await page
+    .getByLabel("Message", { exact: true })
+    .fill("Please quote the selected wooden furniture for our hotel project.");
+  await page.getByRole("button", { name: "Send inquiry" }).click();
+  await expect(page.getByRole("status")).toContainText("received");
+  await login(page);
+  await page.goto("/admin/quotes");
+  await page
+    .getByRole("row")
+    .filter({ hasText: name })
+    .getByRole("link", { name: "Manage" })
+    .click();
+  await expect(page.locator(".notice")).toContainText("Arc lounge chair");
+  await expect(page.locator(".notice")).toContainText("walnut");
+  page.on("dialog", (dialog) => dialog.accept());
+  await page.getByRole("button", { name: "Delete permanently" }).click();
+  await page.goto("/tr/products/sample-product-1");
+  await page.getByRole("button", { name: "Ceviz ağacı", exact: true }).click();
+  await expect(page.locator(".wood-selection")).toContainText("Ceviz ağacı");
+});
+test("home film follows scroll, seeks backwards and respects reduced motion", async ({
+  page,
+  request,
+}) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  const range = await request.get("/videos/hty-story.mp4", {
+    headers: { Range: "bytes=0-1023" },
+  });
+  expect(range.status()).toBe(206);
+  await page.goto("/");
+  await expect(page.locator(".hero-video")).toHaveCount(1);
+  await expect
+    .poll(() =>
+      page
+        .locator(".hero-video")
+        .evaluate((video) => (video as HTMLVideoElement).duration),
+    )
+    .toBeGreaterThan(10);
+  await page.evaluate(() => window.scrollTo(0, window.innerHeight * 0.8));
+  await expect
+    .poll(() =>
+      page
+        .locator(".hero-video")
+        .evaluate((video) => (video as HTMLVideoElement).currentTime),
+    )
+    .toBeGreaterThan(2);
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await expect
+    .poll(() =>
+      page
+        .locator(".hero-video")
+        .evaluate((video) => (video as HTMLVideoElement).currentTime),
+    )
+    .toBeLessThan(0.2);
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await expect(page.locator(".hero-video")).toHaveCount(0);
+  await expect(page.locator(".film-poster")).toBeVisible();
+});

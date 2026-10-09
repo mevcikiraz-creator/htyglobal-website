@@ -1,12 +1,15 @@
 "use client";
 import Arrow from "./arrow";
 import { useState } from "react";
+import { woods, type WoodId } from "@/lib/woods";
 export function InquiryForm({
   quote = false,
   locale = "en",
+  product,
 }: {
   quote?: boolean;
   locale?: string;
+  product?: { slug: string; title: string; code: string; wood?: WoodId };
 }) {
   const [state, setState] = useState("");
   const [busy, setBusy] = useState(false);
@@ -68,6 +71,22 @@ export function InquiryForm({
       }}
     >
       <input type="hidden" name="kind" value={quote ? "quote" : "contact"} />
+      {quote && product && (
+        <div className="quote-product-summary">
+          <p className="eyebrow">
+            {locale === "tr" ? "SEÇTİĞİNİZ ÜRÜN" : "YOUR SELECTED PRODUCT"}
+          </p>
+          <h3>{product.title}</h3>
+          <p>
+            {product.code}
+            {product.wood
+              ? ` · ${woods.find((wood) => wood.id === product.wood)?.[locale === "tr" ? "tr" : "en"]}`
+              : ""}
+          </p>
+          <input type="hidden" name="productSlug" value={product.slug} />
+          <input type="hidden" name="woodType" value={product.wood || ""} />
+        </div>
+      )}
       <div className="form-grid">
         {fields.map((label) => {
           const name =

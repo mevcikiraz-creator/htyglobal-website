@@ -6,11 +6,21 @@ import { notFound } from "next/navigation";
 import { published } from "@/lib/store";
 import { type RecordItem, type Module, images } from "@/lib/content";
 import Nav from "@/components/nav";
+import ProductCatalog from "@/components/product-catalog";
+import ProductDetail from "@/components/product-detail";
+import HomeFilm from "@/components/home-film";
+import { woodId } from "@/lib/woods";
 import { InquiryForm } from "@/components/forms";
 export const dynamic = "force-dynamic";
 type Props = {
   params: Promise<{ path?: string[] }>;
-  searchParams: Promise<{ category?: string }>;
+  searchParams: Promise<{
+    category?: string;
+    q?: string;
+    sort?: string;
+    product?: string;
+    wood?: string;
+  }>;
 };
 const text = (v: unknown, fallback = "") =>
   typeof v === "string" && v.trim() ? v : fallback;
@@ -264,52 +274,75 @@ export default async function Page({ params, searchParams }: Props) {
   const homeCategories = home
     ? await published("productCategories", locale)
     : [];
-  const selected = (await searchParams).category;
+  const search = await searchParams;
+  const selected = search.category;
+  const quoteProduct =
+    type === "quote"
+      ? products.find((product) => product.slug === search.product)
+      : undefined;
+  const quoteWood = quoteProduct ? woodId(search.wood) : undefined;
   const filtered = collection?.filter(
     (x) => !selected || x.categoryId === selected,
   );
   return (
     <>
-      <Nav locale={locale} brand={site.title} logo={text(d.logo)} />
+      <Nav
+        locale={locale}
+        brand={site.title}
+        logo={text(d.logo)}
+        transparent={home}
+      />
       <main>
-        {home ? (
+        {type === "products" ? (
           <>
-            <section className="home-hero">
-              <Picture
-                src={text(ed.image, images[0])}
-                alt={text(
-                  ed.imageAlt,
-                  "A warm architectural interior with bespoke furniture",
-                )}
-                hero
+            {detail && entry ? (
+              <ProductDetail
+                key={entry.id}
+                product={entry}
+                category={text(ed.category)}
+                locale={locale}
+                related={products
+                  .filter((product) => product.id !== entry.id)
+                  .slice(0, 3)}
               />
-              <div className="hero-shade" />
-              <div className="hero-content">
-                <p className="eyebrow">
-                  {locale === "tr"
-                    ? "İSTANBUL’DA ÜRETİLDİ. DÜNYA İÇİN TASARLANDI."
-                    : text(ed.eyebrow)}
-                </p>
-                <h1>
-                  {locale === "tr" && !entry?.translations?.tr
-                    ? "Anlamlı mekânlar\niçin mobilya."
-                    : title}
-                </h1>
-                <Link className="hero-link" href={`${prefix}/projects`}>
-                  {locale === "tr"
-                    ? "Projelerimizi keşfedin"
-                    : "Explore our work"}{" "}
-                  <span>
-                    <Arrow />
-                  </span>
-                </Link>
-              </div>
-              <span className="hero-bottom">HTY GLOBAL / ISTANBUL</span>
-              <span className="hero-scroll">
-                SCROLL TO DISCOVER <Arrow direction="down" />
-              </span>
-            </section>
-            <section className="intro section">
+            ) : (
+              <ProductCatalog
+                products={products}
+                categories={categories}
+                locale={locale}
+                selected={selected}
+                query={search.q}
+                sort={search.sort}
+              />
+            )}
+            <Cta
+              prefix={prefix}
+              title={
+                locale === "tr"
+                  ? "Projenize göre üretelim."
+                  : "Made around your project."
+              }
+            />
+          </>
+        ) : home ? (
+          <>
+            <HomeFilm
+              title={title}
+              eyebrow={
+                locale === "tr"
+                  ? "İSTANBUL’DA ÜRETİLDİ. DÜNYA İÇİN TASARLANDI."
+                  : text(ed.eyebrow)
+              }
+              poster={text(ed.image, images[0])}
+              video={
+                typeof ed.heroVideo === "string"
+                  ? ed.heroVideo
+                  : "/videos/hty-story.mp4"
+              }
+              mode={text(ed.heroVideoMode, "scroll")}
+              locale={locale}
+            />
+            <section className="intro section" id="our-story">
               <p className="eyebrow">01 / A PARTNER IN YOUR VISION</p>
               <h2>{text(ed.introTitle, "Your vision. Our craft.")}</h2>
               <div>
@@ -620,7 +653,20 @@ export default async function Page({ params, searchParams }: Props) {
                     </small>
                   </div>
                 </aside>
-                <InquiryForm quote={type === "quote"} locale={locale} />
+                <InquiryForm
+                  quote={type === "quote"}
+                  locale={locale}
+                  product={
+                    quoteProduct
+                      ? {
+                          slug: String(quoteProduct.slug),
+                          title: String(quoteProduct.title),
+                          code: text(quoteProduct.data?.code),
+                          wood: quoteWood,
+                        }
+                      : undefined
+                  }
+                />
               </section>
             ) : (
               <Cta

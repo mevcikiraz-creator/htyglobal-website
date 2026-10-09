@@ -3,7 +3,8 @@ import { boundedFormData, sameOrigin } from "@/lib/request";
 import { NextResponse } from "next/server";
 import { randomUUID } from "node:crypto";
 import { inquirySchema } from "@/lib/validation";
-import { save } from "@/lib/store";
+import { get, save } from "@/lib/store";
+import { woods } from "@/lib/woods";
 import { upload } from "@/lib/storage";
 import { rateLimit } from "@/lib/rate-limit";
 export async function POST(request: Request) {
@@ -30,6 +31,19 @@ export async function POST(request: Request) {
       ),
     );
     const quote = form.get("kind") === "quote";
+    const selectedProduct =
+      quote && data.productSlug
+        ? await get("products", data.productSlug)
+        : undefined;
+    if (
+      quote &&
+      data.productSlug &&
+      (!selectedProduct || selectedProduct.status !== "PUBLISHED")
+    )
+      return NextResponse.json(
+        { error: "The selected product is not available." },
+        { status: 400 },
+      );
     const files = form
       .getAll("files")
       .filter((v): v is File => v instanceof File && v.size > 0);
@@ -40,8 +54,16 @@ export async function POST(request: Request) {
       throw new Error("Maximum 3 files, 30 MB total");
     const attachments = [];
     for (const file of files) attachments.push((await upload(file, true)).id);
-    const { projectName, projectLocation, projectType, quantity, ...fields } =
-      data;
+    const {
+      projectName,
+      projectLocation,
+      projectType,
+      quantity,
+      productSlug: _productSlug,
+      woodType,
+      ...fields
+    } = data;
+    void _productSlug;
     await save(quote ? "quotes" : "contacts", {
       id: randomUUID(),
       ...fields,
@@ -52,6 +74,15 @@ export async function POST(request: Request) {
         projectType,
         quantity,
         attachments,
+        ...(selectedProduct
+          ? {
+              selectedProductId: selectedProduct.id,
+              selectedProduct: selectedProduct.title,
+              selectedProductCode: selectedProduct.data?.code || "",
+              woodType,
+              wood: woods.find((wood) => wood.id === woodType)?.tr || "",
+            }
+          : {}),
       },
     });
     return NextResponse.json({ ok: true });

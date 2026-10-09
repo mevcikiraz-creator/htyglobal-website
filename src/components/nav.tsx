@@ -5,10 +5,12 @@ export default function Nav({
   locale = "en",
   brand = "HTY GLOBAL",
   logo = "",
+  transparent = false,
 }: {
   locale?: string;
   brand?: string;
   logo?: string;
+  transparent?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const prefix = locale === "tr" ? "/tr" : "";
@@ -17,7 +19,7 @@ export default function Nav({
       ? ["Projeler", "Ürünler", "Hakkımızda", "Üretim", "İletişim"]
       : ["Projects", "Products", "About", "Manufacturing", "Contact"];
   return (
-    <header className="nav">
+    <header className={transparent ? "nav nav-over-film" : "nav"}>
       <Link
         href={prefix || "/"}
         className="brand"

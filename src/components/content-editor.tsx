@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { woods } from "@/lib/woods";
 export default function ContentEditor({
   initial,
   kind,
@@ -37,6 +38,8 @@ export default function ContentEditor({
             "eyebrow",
             "image",
             "imageAlt",
+            "heroVideo",
+            "heroVideoMode",
             "introTitle",
             "selectedWorkTitle",
             "productTitle",
@@ -54,7 +57,18 @@ export default function ContentEditor({
             "imageAlt",
             "body",
             ...(kind === "products"
-              ? ["code", "dimensions", "materials", "finishes", "pdf"]
+              ? [
+                  "code",
+                  "dimensions",
+                  "materials",
+                  "finishes",
+                  "pdf",
+                  "defaultWood",
+                  "woodBeechImage",
+                  "woodWalnutImage",
+                  "woodOakImage",
+                  "woodAshImage",
+                ]
               : kind === "projects"
                 ? [
                     "location",
@@ -97,7 +111,27 @@ export default function ContentEditor({
             {k === "body"
               ? "Full description / content"
               : k.replace(/([A-Z])/g, " $1")}
-            {k === "body" || /Title$/.test(k) ? (
+            {k === "heroVideoMode" ? (
+              <select
+                value={String(data[k] || "scroll")}
+                onChange={(e) => update(k, e.target.value)}
+              >
+                <option value="scroll">Scroll-controlled film</option>
+                <option value="loop">Looping film</option>
+              </select>
+            ) : k === "defaultWood" ? (
+              <select
+                value={String(data[k] || "")}
+                onChange={(e) => update(k, e.target.value)}
+              >
+                <option value="">First available preview</option>
+                {woods.map((wood) => (
+                  <option key={wood.id} value={wood.id}>
+                    {wood.en} / {wood.tr}
+                  </option>
+                ))}
+              </select>
+            ) : k === "body" || /Title$/.test(k) ? (
               <textarea
                 rows={k === "body" ? 6 : 2}
                 value={String(data[k] || "")}

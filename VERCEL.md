@@ -74,3 +74,7 @@ Veritabanı, secret ve site adresi ile halka açık sayfalar ve dosyasız CMS/fo
 - Kalıcı depolama entegrasyonundan sonra dosyalar yeni deployment'ta da erişilebilir; özel ekler yetkisiz kişiye açılmıyor.
 
 `main` dalına sonraki push işlemleri Vercel Git entegrasyonu etkinse yeni deployment başlatır. Yayın URL'si Vercel projesindeki deployment sonucundan alınır; bir adresi tahmin etmeyin.
+
+## Koleksiyon güncellemesi
+
+Production build, bootstrap adımından sonra `content:release` çalıştırır. Bu sürüm yalnızca ilk örnek ürünlerin değiştirilmemiş görsellerini yeni ağaç görünümleriyle günceller ve ana sayfaya mevcut bir video alanı yoksa örnek filmi ekler. Silinmiş ürünler yeniden oluşturulmaz; kullanıcı hesapları ve özel yüklenmiş içerikler değiştirilmez. Son commit `main` dalına gönderildiğinde bağlı Git entegrasyonu yeni deployment başlatır. Vercel ayarlarında Build Command override varsa `npm run build:vercel` olmalıdır.

@@ -1,3 +1,4 @@
+import { catalogAssets, catalogImages } from "./catalog-assets";
 export const modules = [
   "products",
   "productCategories",
@@ -137,8 +138,7 @@ export function sampleData(): Record<Module, RecordItem[]> {
       s,
       "Sample product — a considered expression of material and proportion. Developed for demanding contract interiors and tailored to the requirements of each project.",
       {
-        image: "/sample-chair.webp",
-        gallery: ["/sample-chair.webp", images[i % 5]],
+        ...catalogImages(catalogAssets[i].model),
         code: "HTY-" + (100 + i),
         body: "This illustrative furniture concept balances material character with the practical needs of a contract interior. Dimensions, upholstery, finishes and detailing can be developed around the project specification. Ask our team about design development, sampling and a coordinated furniture package.",
         dimensions: "Custom dimensions available",
@@ -146,7 +146,7 @@ export function sampleData(): Record<Module, RecordItem[]> {
         finishes: "Project-specific finishes",
       },
     ),
-    categoryId: db.productCategories[i % db.productCategories.length].id,
+    categoryId: catalogAssets[i].category,
     sectorId: db.sectors[i % 6].id,
   }));
   db.pages = [
@@ -156,6 +156,8 @@ export function sampleData(): Record<Module, RecordItem[]> {
       "We bring spaces to life through considered furniture. From our home in Istanbul to projects around the world, we partner with architects, designers and developers to make their vision tangible.",
       {
         eyebrow: "CRAFTED IN ISTANBUL. MADE FOR THE WORLD.",
+        heroVideo: "/videos/hty-story.mp4",
+        heroVideoMode: "scroll",
         image: images[0],
         introTitle: "Your vision.\nOur craft.",
         selectedWorkTitle: "Made for the way\nwe live.",

@@ -78,3 +78,15 @@ test("origin checks use the configured public URL behind a reverse proxy", async
     else process.env.SITE_URL = previous;
   }
 });
+
+test("inquiries reject unsupported wood selections", () => {
+  assert.equal(
+    inquirySchema.safeParse({
+      name: "Example buyer",
+      email: "buyer@example.invalid",
+      message: "Please quote furniture for our project.",
+      woodType: "unsupported-wood",
+    }).success,
+    false,
+  );
+});

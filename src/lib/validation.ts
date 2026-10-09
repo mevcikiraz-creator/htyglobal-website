@@ -11,6 +11,8 @@ export const inquirySchema = z.object({
   projectLocation: z.string().max(200).default(""),
   projectType: z.string().max(100).default(""),
   quantity: z.string().max(60).default(""),
+  productSlug: z.string().max(200).default(""),
+  woodType: z.enum(["", "beech", "walnut", "oak", "ash"]).default(""),
 });
 export const contentSchema = z.object({
   id: z.string(),
