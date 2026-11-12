@@ -14,15 +14,25 @@ export default function Nav({
 }) {
   const [open, setOpen] = useState(false);
   const prefix = locale === "tr" ? "/tr" : "";
-  const labels =
-    locale === "tr"
-      ? ["Projeler", "Ürünler", "Hakkımızda", "Üretim", "İletişim"]
-      : ["Projects", "Products", "About", "Manufacturing", "Contact"];
+  const tr = locale === "tr";
+  const groups = [
+    [
+      { path: "projects", label: tr ? "Projeler" : "Projects" },
+      { path: "products", label: tr ? "Ürünler" : "Products" },
+      { path: "about", label: tr ? "Hakkımızda" : "About" },
+    ],
+    [
+      { path: "manufacturing", label: tr ? "Üretim" : "Manufacturing" },
+      { path: "contact", label: tr ? "İletişim" : "Contact" },
+      { path: "products", label: tr ? "Malzemeler" : "Materials" },
+    ],
+  ];
   return (
     <header className={transparent ? "nav nav-over-film" : "nav"}>
       <Link
         href={prefix || "/"}
         className="brand"
+        aria-label={brand}
         onClick={() => setOpen(false)}
       >
         {logo ? (
@@ -36,33 +46,43 @@ export default function Nav({
         <small>CONTRACT FURNITURE</small>
       </Link>
       <nav
+        id="main-navigation"
         className={open ? "nav-links open" : "nav-links"}
         aria-label="Main navigation"
       >
-        {["projects", "products", "about", "manufacturing", "contact"].map(
-          (p, i) => (
-            <Link
-              key={p}
-              href={`${prefix}/${p}`}
-              onClick={() => setOpen(false)}
-            >
-              {labels[i]}
-            </Link>
-          ),
-        )}
-        <Link
-          href={locale === "tr" ? "/" : "/tr"}
-          onClick={() => setOpen(false)}
-          className="language"
-        >
-          {locale === "tr" ? "EN" : "TR"}
-        </Link>
+        {groups.map((links, index) => (
+          <div
+            key={index}
+            className={`nav-group ${index === 0 ? "nav-left" : "nav-right"}`}
+          >
+            {links.map(({ path, label }) => (
+              <Link
+                key={path}
+                href={`${prefix}/${path}`}
+                onClick={() => setOpen(false)}
+              >
+                {label}
+              </Link>
+            ))}
+            {/* Reload the root layout so the document language follows the locale. */}
+            {index === 1 && (
+              <a
+                href={tr ? "/" : "/tr"}
+                onClick={() => setOpen(false)}
+                className="language"
+              >
+                {tr ? "EN" : "TR"}
+              </a>
+            )}
+          </div>
+        ))}
       </nav>
       <button
         className="menu-button"
         aria-expanded={open}
+        aria-controls="main-navigation"
         aria-label="Toggle menu"
-        onClick={() => setOpen(!open)}
+        onClick={() => setOpen((wasOpen) => !wasOpen)}
       >
         {open ? "Close −" : "Menu +"}
       </button>
