@@ -24,7 +24,6 @@ export default function Nav({
     [
       { path: "manufacturing", label: tr ? "Üretim" : "Manufacturing" },
       { path: "contact", label: tr ? "İletişim" : "Contact" },
-      { path: "materials", label: tr ? "Malzemeler" : "Materials" },
     ],
   ];
   return (
@@ -49,6 +48,7 @@ export default function Nav({
         id="main-navigation"
         className={open ? "nav-links open" : "nav-links"}
         aria-label="Main navigation"
+        lang={locale}
       >
         {groups.map((links, index) => (
           <div
@@ -64,15 +64,23 @@ export default function Nav({
                 {label}
               </Link>
             ))}
-            {/* Reload the root layout so the document language follows the locale. */}
             {index === 1 && (
-              <a
-                href={tr ? "/" : "/tr"}
-                onClick={() => setOpen(false)}
-                className="language"
-              >
-                {tr ? "EN" : "TR"}
-              </a>
+              <div className="nav-end">
+                <Link
+                  href={`${prefix}/materials`}
+                  onClick={() => setOpen(false)}
+                >
+                  {tr ? "Malzemeler" : "Materials"}
+                </Link>
+                {/* Reload the root layout so the document language follows the locale. */}
+                <a
+                  href={tr ? "/" : "/tr"}
+                  onClick={() => setOpen(false)}
+                  className="language"
+                >
+                  {tr ? "EN" : "TR"}
+                </a>
+              </div>
             )}
           </div>
         ))}
