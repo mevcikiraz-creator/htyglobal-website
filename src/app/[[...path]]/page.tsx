@@ -9,6 +9,8 @@ import Nav from "@/components/nav";
 import ProductCatalog from "@/components/product-catalog";
 import ProductDetail from "@/components/product-detail";
 import HomeFilm from "@/components/home-film";
+import Materials from "@/components/materials";
+import { materialsPage } from "@/lib/materials";
 import { woodId } from "@/lib/woods";
 import { InquiryForm } from "@/components/forms";
 export const dynamic = "force-dynamic";
@@ -61,7 +63,8 @@ async function content(parts: string[], locale: string) {
   )[type];
   if (mod && parts[1])
     return (await published(mod, locale)).find((x) => x.slug === parts[1]);
-  return (await published("pages", locale)).find((x) => x.slug === type);
+  const page = (await published("pages", locale)).find((x) => x.slug === type);
+  return page || (type === "materials" ? materialsPage(locale) : undefined);
 }
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { path = [] } = await params;
@@ -225,6 +228,7 @@ export default async function Page({ params, searchParams }: Props) {
   ]);
   const site = settings[0] || {};
   const d = site.data || {};
+  const siteLogo = text(d.logo, "/hty-logo.png");
   const entry = await content(parts, locale);
   const detail = parts.length === 2;
   if (detail && !["projects", "products", "sectors", "news"].includes(type))
@@ -240,6 +244,7 @@ export default async function Page({ params, searchParams }: Props) {
   if (detail && !entry) notFound();
   if (!entry && !collection) notFound();
   const home = type === "home";
+  const storyPage = !["contact", "quote", "materials"].includes(type) && !home;
   const title =
     entry?.title ||
     (locale === "tr"
@@ -290,7 +295,7 @@ export default async function Page({ params, searchParams }: Props) {
       <Nav
         locale={locale}
         brand={site.title}
-        logo={text(d.logo)}
+        logo={siteLogo}
         transparent={home}
       />
       <main>
@@ -482,12 +487,18 @@ export default async function Page({ params, searchParams }: Props) {
         ) : (
           <>
             <section className="page-heading">
-              <p className="eyebrow">HTY GLOBAL / {type.toUpperCase()}</p>
+              <p className="eyebrow">
+                HTY GLOBAL /{" "}
+                {locale === "tr" && type === "materials"
+                  ? "MALZEMELER"
+                  : type.toUpperCase()}
+              </p>
               <h1>{title}</h1>
               {entry?.description && (
                 <p className="lead">{entry.description}</p>
               )}
             </section>
+            {type === "materials" && <Materials locale={locale} />}
             {collection && !detail && (
               <section className="section collection">
                 <nav className="filters" aria-label="Categories">
@@ -514,7 +525,7 @@ export default async function Page({ params, searchParams }: Props) {
                 )}
               </section>
             )}
-            {entry && !["contact", "quote"].includes(type) && !home && (
+            {entry && storyPage && (
               <>
                 <Picture
                   src={text(ed.image, images[1])}
@@ -685,8 +696,15 @@ export default async function Page({ params, searchParams }: Props) {
       </main>
       <footer>
         <div className="footer-top">
-          <Link className="brand" href={prefix || "/"}>
-            {site.title || "HTY GLOBAL"}
+          <Link
+            className="brand"
+            href={prefix || "/"}
+            aria-label={site.title || "HTY Global"}
+          >
+            <span
+              className="brand-image"
+              style={{ backgroundImage: `url(${siteLogo})` }}
+            />
             <small>CONTRACT FURNITURE</small>
           </Link>
           <p>{text(d.footer)}</p>

@@ -10,6 +10,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ["", undefined],
     ["projects", undefined],
     ["products", undefined],
+    ["materials", undefined],
     ["sectors", undefined],
     ["news", undefined],
   ]);

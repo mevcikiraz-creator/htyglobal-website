@@ -1,5 +1,9 @@
 # Asset provenance — October 2026 collection revision
 
+## HTYGLOBAL logo — supplied November 2026
+
+`public/hty-logo.png` is a lossless export of the transparent HTYGLOBAL wordmark layer in the user-supplied `HTY Logo.psd` (2666 × 346 pixels). The lettering was not redrawn. The header uses the original dark tone on interior pages and a white CSS treatment over the homepage film.
+
 ## Fiorentini Bistro — Moscow, Russia
 
 `public/projects/fiorentini-bistro-moscow/01.webp` through `12.webp` are the 12 photographs supplied by the user in `Fiorentini Bistro - Moskova.rar`. Original JPEGs were rotated according to EXIF orientation, resized to a maximum 2000 pixels on either axis, and exported as WebP with metadata removed. Photo 01 is the project cover; photos 02–12 form the gallery. These supplied photographs document this restaurant reference and are separate from the illustrative demo assets below. No project year, photographer credit, specific timber species or production scope was supplied or invented.

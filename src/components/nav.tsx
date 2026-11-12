@@ -4,7 +4,7 @@ import { useState } from "react";
 export default function Nav({
   locale = "en",
   brand = "HTY GLOBAL",
-  logo = "",
+  logo = "/hty-logo.png",
   transparent = false,
 }: {
   locale?: string;
@@ -24,7 +24,7 @@ export default function Nav({
     [
       { path: "manufacturing", label: tr ? "Üretim" : "Manufacturing" },
       { path: "contact", label: tr ? "İletişim" : "Contact" },
-      { path: "products", label: tr ? "Malzemeler" : "Materials" },
+      { path: "materials", label: tr ? "Malzemeler" : "Materials" },
     ],
   ];
   return (
